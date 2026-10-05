@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RELOOP RECYCLING FZE - Tax Invoice</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #f2f2f2;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+    font-size: 10px;
+  }
+  .invoice {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    padding: 8mm;
+    border: 1px solid #222;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { border: 1px solid #222; padding: 3px 4px; vertical-align: middle; }
+  .header td { height: 32mm; }
+  .company { text-align: center; font-weight: 700; font-size: 16px; line-height: 1.35; }
+  .company small { display:block; font-size: 9px; font-weight: 600; }
+  .logo { width: 28mm; text-align:center; }
+  .logo img { max-width: 24mm; max-height: 25mm; }
+  .title { text-align:center; font-size: 12px; font-weight:700; padding: 6px; border:0; }
+  .details td { height: 9mm; }
+  .buyer { width: 43%; vertical-align: top; }
+  .label { font-weight: 700; }
+  .yellow { background: #fff900; }
+  .items th { background: #fff900; text-align:center; font-size: 8px; }
+  .items td { font-size: 8px; height: 8mm; }
+  .center { text-align:center; }
+  .right { text-align:right; }
+  .words { padding: 6px; vertical-align: top; height: 20mm; }
+  .words strong { display:block; margin-bottom:5px; }
+  .summary th { background:#fff900; text-align:center; }
+  .summary td, .summary th { font-size: 8px; }
+  .declaration td { height: 10mm; vertical-align: top; }
+  .signature { text-align:center; vertical-align:middle !important; }
+  .declaration-empty { width: 30%; }
+  .payment-signature-section { margin-top: 8px; page-break-inside: avoid; }
+  .payment-signature-section img { display:block; width:100%; height:auto; margin:0 auto; }
+  .terms { margin-top: 12px; padding-top: 8px; border: 1px solid #222; padding: 10px 12px; page-break-before: always; font-size: 9px; line-height: 1.35; }
+  .terms-title { text-align:center; color:#16734a; font-size:12px; font-weight:700; margin-bottom:10px; text-transform:uppercase; }
+  .term { margin:0 0 7px 0; }
+  .term strong { font-weight:700; }
+  .footer td { background:#fff900; font-size: 7px; }
+  .generated { text-align:center; font-size:8px; padding:5px; border:0; }
+  .muted { color:#333; }
+
+  .detail-input { width: 100%; box-sizing: border-box; border: 0; border-bottom: 1px dotted #777; background: transparent; padding: 4px 2px; font: inherit; color: inherit; outline: none; }
+  .detail-input:focus { border-bottom: 1px solid #333; background: #fffde8; }
+  input {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    font: inherit;
+    padding: 1px 2px;
+    color: inherit;
+  }
+  input:focus {
+    outline: 1px solid #777;
+    border-color: #777;
+    background: #fff;
+  }
+  textarea {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    font: inherit;
+    padding: 1px 2px;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  textarea:focus {
+    outline: 1px solid #777;
+    border-color: #777;
+    background: #fff;
+  }
+  .grand-edit {
+    width: 100%;
+    text-align: right;
+    font-weight: 700;
+    border: 1px solid transparent;
+    background: transparent;
+  }
+  .grand-total .grand-edit:focus {
+    outline: 1px solid #777;
+    border-color: #777;
+    background: #fff;
+  }
+  .grand-total .center .grand-edit { text-align: center; }
+  .items input[type="number"] { text-align: right; }
+  .summary input[type="number"] { text-align: right; }
+  .summary .summary-rate { text-align: center; }
+  .summary .input-number { min-width: 65px; }
+  .items .qty, .items .vat-rate { text-align: center; }
+  textarea {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    font: inherit;
+    padding: 1px 2px;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  textarea:focus {
+    outline: 1px solid #777;
+    border-color: #777;
+    background: #fff;
+  }
+  .items textarea.desc,
+  .summary textarea.summary-name {
+    display: block;
+    width: 100%;
+    min-height: 8mm;
+    resize: none;
+    overflow: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .action-col { width: 62px; }
+  .remove-row, .add-row {
+    border: 1px solid #555;
+    background: #fff;
+    cursor: pointer;
+    font-size: 8px;
+    padding: 4px 6px;
+  }
+  .add-row {
+    margin-top: 5px;
+    font-weight: 700;
+  }
+  .grand-total td, .summary-total td {
+    font-weight: 700;
+    background: #fff900;
+  }
+  .table-wrap { margin-bottom: 6px; }
+
+ .print-footer {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm 10mm 18mm 10mm;
+    }
+
+    body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+    }
+
+    .invoice {
+        border: 0;
+        margin: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .print-footer {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        width: 100%;
+        height: 10mm;
+
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 3mm 5mm;
+
+        background: #fff900;
+        border-top: 1px solid #222;
+
+        font-size: 8px;
+        font-weight: 600;
+
+        z-index: 9999;
+    }
+}
+  
+  @media print {
+    /* Remove the Action column itself, including its cells.
+       Do NOT rely on hiding only the button; otherwise the blank cell
+       can remain part of the printed table structure. */
+    #itemsTable th.action-col,
+    #itemsTable td.action-col,
+    #summaryTable th.action-col,
+    #summaryTable td.action-col {
+      display: none !important;
+    }
+
+    /* Hide editing controls that are outside the tables. */
+    .remove-row,
+    .add-row {
+      display: none !important;
+    }
+
+    input,
+    textarea {
+      border: none !important;
+      background: transparent !important;
+    }
+  }
+
+
+  @media print {
+    body { background:#fff; padding:0; }
+    .invoice { border:0; margin:0; }
+  }
+  @media (max-width: 900px) {
+    body { padding: 5px; }
+    .invoice { width: 100%; min-height: auto; padding: 10px; overflow-x:auto; }
+  }
+
+ .words-input {
+    width: 70%;
+    border: 0;
+    border-bottom: 1px dotted #777;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    padding: 1px 2px;
+    outline: none;
+}
+
+.words-input:focus {
+    border-bottom: 1px solid #333;
+    background: #fffde8;
+}
+
+@media print {
+    .words-input {
+        border: 0 !important;
+        background: transparent !important;
+    }
+}
+
+.payment-details {
+    width: 400px;
+    /*border:1px solid #ddd;*/
+    padding:20px;
+    font-family: Arial, sans-serif;
+}
+
+.payment-details h3 {
+    margin-bottom:15px;
+}
+
+.payment-details table {
+    width:100%;
+    border-collapse:collapse;
+}
+
+.payment-details td {
+    padding:8px;
+    border-bottom:1px solid #eee;
+}
+
+.signature-area {
+    margin-top:30px;
+    display:flex;
+    justify-content:flex-end;
+    gap:20px;
+}
+
+.signature-area img {
+    width:100px;
+}
+
+ .payment-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 40px;
+}
+
+
+.payment-details {
+    width: 60%;
+}
+
+
+.signature-area {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+
+.signature-area img {
+    width: 100%;
+    margin-bottom: 10px;
+}
+}
+</style>
+</head>
+<body>
+
+ <div class="print-footer">
+  <span>📞 +971 543252882</span>
+  <span>🌐 www.reloopglobal.com</span>
+  <span>✉ info@reloopglobal.com</span>
+</div>
+
+ 
+<div class="invoice">
+
+  <table class="header">
+    <tr>
+      <td class="company">
+        RELOOP RECYCLING FZE
+        <small>RA8Q05, JABEL ALI, DUBAI, UAE</small>
+        <small>TRN: 105174062300003</small>
+      </td>
+      <td class="logo">
+        <img src='https://learndatascienceindia.github.io/RL-invoice-no-vat/logo.png' alt='Reloop Recycling logo'>
+      </td>
+    </tr>
+  </table>
+
+  <div class="title">Tax Invoice</div>
+
+  <table class="details">
+  <tr>
+    <td class="buyer" rowspan="6">
+  
+  <span class="label">Buyer</span><br>
+
+  <input 
+    class="detail-input"
+    value=""
+    placeholder=""
+    style="width:100%; border:none; background:transparent; padding:3px 0; box-sizing:border-box;"
+  >
+
+   <div style="display:flex; align-items:center; width:100%;  padding:3px 0;">
+    <span style="white-space:nowrap; margin-right:5px;">TRN:</span>
+    <input 
+      value=""
+      placeholder=""
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;"
+    >
+  </div>
+     <div style="display:flex; align-items:center; width:100%;  padding:3px 0;">
+    <span style="white-space:nowrap; margin-right:5px;">Address:</span>
+    <input 
+      value=""
+      placeholder=""
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;"
+    >
+  </div>
+
+     <div style="display:flex; align-items:center; width:100%;  padding:3px 0;">
+    <span style="white-space:nowrap; margin-right:5px;">Contact Person:</span>
+    <input 
+      value=""
+      placeholder=""
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;"
+    >
+  </div>
+
+       <div style="display:flex; align-items:center; width:100%;  padding:3px 0;">
+    <span style="white-space:nowrap; margin-right:5px;">Phone number:</span>
+    <input 
+      value=""
+      placeholder=""
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;"
+    >
+  </div>
+     
+   <div style="display:flex; align-items:center; width:100%;  padding:3px 0;">
+    <span style="white-space:nowrap; margin-right:5px;">Country:</span>
+    <input 
+      value=""
+      placeholder=""
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;"
+    >
+  </div>
+
+</td>
+
+    <td>
+      <span class="label">Invoice No.</span><br>
+      <input class="detail-input" value="">
+    </td>
+
+    <td>
+      <span class="label">Invoice Date</span><br>
+      <input class="detail-input" value="">
+    </td>
+  </tr>
+
+  <tr>
+    <td class="yellow">
+      <span class="label">Term of Delivery</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+
+    <td>
+      <span class="label">Payment Terms</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <span class="label">Due Date</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+
+    <td>
+      <span class="label">Other Reference(s)</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <span class="label">Buyer’s Order No.</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+
+    <td>
+      <span class="label">Buyer’s Date</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <span class="label">Delivery Note No.</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+
+    <td>
+      <span class="label">Delivery Note Date</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <span class="label">Despatched through</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+
+    <td>
+      <span class="label">Destination</span><br>
+      <input class="detail-input" placeholder="">
+    </td>
+  </tr>
+</table>
+
+  <div class="table-wrap">
+    <table class="items" id="itemsTable">
+      <thead>
+        <tr>
+          <th>Sl.<br>No.</th>
+          <th>Description</th>
+          <th>H.S CODE</th>
+          <th>Quantity<br>(Units)</th>
+          <th>Unit<br>Price (USD)</th>
+          <th>Taxable Total<br>(USD)</th>
+          <th>VAT<br>%</th>
+          <th>VAT<br>(USD)</th>
+          <th>Total including<br>VAT (USD)</th>
+          <th>Total including<br>VAT (AED)</th>
+          <th>VAT<br>(AED)</th>
+          <th class="action-col print-hide">Action</th>
+        </tr>
+      </thead>
+      <tbody id="itemRows">
+        <tr class="item-row">
+          <td class="center row-no">1</td>
+          <td><textarea 
+    class="desc"
+    rows="1"
+    style="width:100%; min-height:8mm; resize:none; overflow:hidden; border:1px solid transparent; background:transparent; font:inherit; padding:1px 2px; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere;"
+    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';"
+  >Product 2 Details</textarea></td>
+          <td><input class="hs" value="—"></td>
+          <td><input class="qty" type="number" min="0" step="any" value="318"></td>
+          <td><input class="unit-price" type="number" min="0" step="0.01" value="114.29"></td>
+          <td><input class="taxable input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="vat-rate" type="number" min="0" step="0.01" value="5"></td>
+          <td><input class="vat-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="total-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="total-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td class="center action-col"><button type="button" class="remove-row" onclick="removeItemRow(this)">Remove</button></td>
+        </tr>
+        <tr class="item-row">
+          <td class="center row-no">2</td>
+         <td><textarea 
+    class="desc"
+    rows="1"
+    style="width:100%; min-height:8mm; resize:none; overflow:hidden; border:1px solid transparent; background:transparent; font:inherit; padding:1px 2px; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere;"
+    oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';"
+  >Product 2 Details</textarea></td></td>
+          <td><input class="hs" value="—"></td>
+          <td><input class="qty" type="number" min="0" step="any" value="90"></td>
+          <td><input class="unit-price" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="taxable input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="vat-rate" type="number" min="0" step="0.01" value="5"></td>
+          <td><input class="vat-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="total-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="total-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td class="center action-col"><button type="button" class="remove-row" onclick="removeItemRow(this)">Remove</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="grand-total">
+          <td></td>
+          <td><strong>Grand Total</strong></td>
+          <td></td>
+          <td class="center"><input id="grandQty" class="grand-edit" type="number" min="0" step="any" value="0"></td>
+          <td></td>
+          <td class="right"><input id="grandTaxable" class="grand-edit" type="number" min="0" step="0.01" value="0.00"></td>
+          <td></td>
+          <td class="right"><input id="grandVatUsd" class="grand-edit" type="number" min="0" step="0.01" value="0.00"></td>
+          <td class="right"><input id="grandTotalUsd" class="grand-edit" type="number" min="0" step="0.01" value="0.00"></td>
+          <td class="right"><input id="grandTotalAed" class="grand-edit" type="number" min="0" step="0.01" value="0.00"></td>
+          <td class="right"><input id="grandVatAed" class="grand-edit" type="number" min="0" step="0.01" value="0.00"></td>
+          
+        </tr>
+      </tfoot>
+    </table>
+    <button type="button" class="add-row" onclick="addItemRow()">+ Add Item Row</button>
+  </div>
+
+  <table>
+    <tr>
+      <td class="words" colspan="7">
+        <strong>Amount (in words)</strong>
+       USD Dollar <input class="words-input" type="text" placeholder=""><br>
+Equivalent UAE Dirham <input class="words-input" type="text" placeholder="">
+      </td>
+    </tr>
+  </table>
+ 
+
+  <div class="table-wrap">
+    <table class="summary" id="summaryTable">
+      <thead>
+        <tr>
+          <th>SUMMARY</th><th>VAT Rate</th><th>Amount in USD</th>
+          <th>Conversion Rate</th><th>Amount in AED</th><th>VAT in AED</th>
+          <th class="action-col print-hide">Action</th>
+        </tr>
+      </thead>
+      <tbody id="summaryRows">
+        <tr class="summary-row">
+          <td><input class="summary-name" value="Standard Rated Supply"></td>
+          <td><input class="summary-rate" type="number" min="0" step="0.01" value="5"></td>
+          <td><input class="summary-usd input-number" type="number" min="0" step="0.01" value="10390.74"></td>
+          <td><input class="conversion-rate input-number" type="number" min="0" step="0.0001" value="3.4977"></td>
+          <td><input class="summary-aed input-number" type="number" min="0" step="0.01" value="38343.22"></td>
+          <td><input class="summary-vat-aed input-number" type="number" min="0" step="0.01" value="1817.16"></td>
+          <td class="center action-col"><button type="button" class="remove-row" onclick="removeSummaryRow(this)">Remove</button></td>
+        </tr>
+        <tr class="summary-row">
+          <td><input class="summary-name" value="Zero Rated Supply"></td>
+          <td><input class="summary-rate" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="summary-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="conversion-rate input-number" type="number" min="0" step="0.0001" value="3.4977"></td>
+          <td><input class="summary-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="summary-vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td class="center action-col"><button type="button" class="remove-row" onclick="removeSummaryRow(this)">Remove</button></td>
+        </tr>
+        <tr class="summary-row">
+          <td><input class="summary-name" value="Exempted Rated Supply"></td>
+          <td><input class="summary-rate" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="summary-usd input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="conversion-rate input-number" type="number" min="0" step="0.0001" value="3.4977"></td>
+          <td><input class="summary-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td><input class="summary-vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>
+          <td class="center action-col"><button type="button" class="remove-row" onclick="removeSummaryRow(this)">Remove</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="summary-total">
+          <td><strong>Total Amount</strong></td><td>—</td>
+          <td class="right" id="summaryTotalUsd"><strong>0.00</strong></td>
+          <td class="right" id="summaryTotalConversion"><strong>3.4977</strong></td>
+          <td class="right" id="summaryTotalAed"><strong>0.00</strong></td>
+          <td class="right" id="summaryTotalVatAed"><strong>0.00</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+    <button type="button" class="add-row" onclick="addSummaryRow()">+ Add Summary Row</button>
+  </div>
+
+  <table class="declaration">
+    <tr>
+      <td>
+        <strong>Declaration</strong><br>
+     1. We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.<br/>
+       2. And after 1 Feb 2026, VAT on scrap charge on RCM
+     
+
+      </td>
+     
+    </tr>
+  </table>
+<div class="payment-wrapper">
+
+    <!-- Left Side: Payment Details -->
+    <div class="payment-details">
+        <h3>Payment Details</h3>
+
+        <table>
+         <tr>
+                <td><strong>Payment Terms</strong></td>
+                <td><input 
+      value="Cash / Bank Transfer"
+      placeholder="Cash / Bank Transfer"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+         
+            <tr>
+                <td><strong>Bank Name</strong></td>
+                <td><input 
+      value="RAKBANK"
+      placeholder="RAKBANK"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+
+            <tr>
+                <td><strong>Account Name</strong></td>
+                <td><input 
+      value="Reloop Recycling FZE"
+      placeholder="Reloop Recycling FZE"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+
+            <tr>
+                <td><strong>Account Number</strong></td>
+                <td><input 
+      value="0333716508001"
+      placeholder="Account Number"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+
+            <tr>
+                <td><strong>IBAN</strong></td>
+                <td><input 
+      value="AE430400000333716508001"
+      placeholder="Enter IBAN"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+         <tr>
+                <td><strong>SWIFT Code</strong></td>
+                <td><input 
+      value="NRAKAEAK"
+      placeholder="Enter TRN"
+      style="flex:1; min-width:0; border:none; outline:none; background:transparent; font-size:inherit; font-family:inherit; padding:0;" > </td>
+            </tr>
+       
+
+    
+        </table>
+
+     
+    </div>
+
+
+    <!-- Right Side: Signature -->
+    <div class="signature-area">
+
+        <img src="https://raw.githubusercontent.com/learnDataScienceIndia/-charan-aduit-v3/main/stamp%20and%20signature.png" alt="Company Stamp">
+
+      
+
+    </div>
+
+</div>
+
+
+  <table class="footer">
+    <tr>
+      <td>
+       *Buyer Declaration in case of RCM * This supply is subject to Reverse Charge Mechanism under Cabinet Decision 153 of 2025. VAT shall be accounted by the recipient.
+      </td>
+    </tr>
+  </table>
+
+
+
+
+  <section class="terms">
+    <div class="terms-title">Terms &amp; Conditions – Reloop Recycling</div>
+
+    <p class="term"><strong>1 – Product Condition Disclosure</strong><br>
+    The functionality and condition of all equipment have been fully disclosed to the Buyer prior to sale. By proceeding with the purchase, the Buyer acknowledges and accepts the stated condition.</p>
+
+    <p class="term"><strong>2 – Payment Terms</strong><br>
+    Full payment must be made within 48–72 hours from the receipt of the invoice issued by Reloop Recycling. Failure to complete payment or arrange timely collection may result in order cancellation at the sole discretion of Reloop Recycling.</p>
+
+    <p class="term"><strong>3 – Order Availability &amp; Collection</strong><br>
+    Purchased goods will be ready for collection within 3 business days after receipt of full payment, allowing sufficient time for packing and processing.</p>
+
+    <p class="term"><strong>4 – Shipping, Duties &amp; Risk Transfer</strong><br>
+    The Buyer is solely responsible for all freight, insurance, customs clearance, compliance, import duties, VAT, and any other applicable taxes or charges outside the United States / United Arab Emirates.</p>
+
+    <p class="term"><strong>5 – Delays</strong><br>
+    Any delays arising due to unforeseen circumstances will be promptly communicated to the Buyer.</p>
+
+    <p class="term"><strong>6 – RMA (Return Merchandise Authorization)</strong><br>
+    The Buyer must report any discrepancies between the delivered goods and the provided inventory list within 10 days of receipt of goods to initiate an RMA request. Reloop Recycling requires 15–20 business days to review and resolve RMA claims, including verification of serial numbers and audit of the inventory. Upon validation, resolution will be provided either through a credit note or refund, as applicable.</p>
+
+    <p class="term"><strong>7 – Grading Tolerance (Used Equipment)</strong><br>
+    All equipment is sold as used or as described. Due to the nature of used goods, a variance of approximately 5–10% in grading, condition, or notes may occur. Such variation is considered normal and acceptable. The Buyer acknowledges and agrees to this tolerance and shall not raise any claim, dispute, or RMA regarding such differences.</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  function money(n) {
+    return (Number(n) || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function value(selector, root) {
+    const el = (root || document).querySelector(selector);
+    return el ? (Number(el.value) || 0) : 0;
+  }
+
+  function conversionRate() {
+    const el = document.querySelector("#summaryRows .conversion-rate");
+    return el ? (Number(el.value) || 0) : 0;
+  }
+
+  function setGrandValue(id, number, integerOnly) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = integerOnly && Number.isInteger(number) ? String(number) : Number(number || 0).toFixed(2);
+  }
+
+  function calculateInvoice(recalculateDerived) {
+    let qty = 0, taxable = 0, vatUsd = 0, totalUsd = 0, totalAed = 0, vatAed = 0;
+    const rate = conversionRate();
+
+    document.querySelectorAll("#itemRows .item-row").forEach(function (row, index) {
+      row.querySelector(".row-no").textContent = index + 1;
+
+      const q = value(".qty", row);
+      const price = value(".unit-price", row);
+      const vatRate = value(".vat-rate", row);
+
+      // Recalculate derived cells only when a quantity/price/VAT-rate field changed.
+      if (recalculateDerived) {
+        const tax = q * price;
+        const v = tax * vatRate / 100;
+        const usd = tax + v;
+        const aed = usd * rate;
+        const vaed = v * rate;
+        row.querySelector(".taxable").value = tax.toFixed(2);
+        row.querySelector(".vat-usd").value = v.toFixed(2);
+        row.querySelector(".total-usd").value = usd.toFixed(2);
+        row.querySelector(".total-aed").value = aed.toFixed(2);
+        row.querySelector(".vat-aed").value = vaed.toFixed(2);
+      }
+
+      // Grand Total always uses the CURRENT editable cell values.
+      taxable += value(".taxable", row);
+      vatUsd += value(".vat-usd", row);
+      totalUsd += value(".total-usd", row);
+      totalAed += value(".total-aed", row);
+      vatAed += value(".vat-aed", row);
+      qty += q;
+    });
+
+    setGrandValue("grandQty", qty, true);
+    setGrandValue("grandTaxable", taxable);
+    setGrandValue("grandVatUsd", vatUsd);
+    setGrandValue("grandTotalUsd", totalUsd);
+    setGrandValue("grandTotalAed", totalAed);
+    setGrandValue("grandVatAed", vatAed);
+
+    calculateSummary();
+  }
+
+  function calculateSummary() {
+    let usd = 0, aed = 0, vatAed = 0, weightedRate = 0;
+
+    document.querySelectorAll("#summaryRows .summary-row").forEach(function (row) {
+      const u = value(".summary-usd", row);
+      const a = value(".summary-aed", row);
+      const v = value(".summary-vat-aed", row);
+      const r = value(".conversion-rate", row);
+
+      usd += u;
+      aed += a;
+      vatAed += v;
+      weightedRate += u * r;
+    });
+
+    const rate = usd ? weightedRate / usd : conversionRate();
+
+    document.getElementById("summaryTotalUsd").textContent = money(usd);
+    document.getElementById("summaryTotalConversion").textContent = rate.toFixed(4);
+    document.getElementById("summaryTotalAed").textContent = money(aed);
+    document.getElementById("summaryTotalVatAed").textContent = money(vatAed);
+  }
+
+  function autoGrowTextarea(textarea) {
+    textarea.style.height = "auto";
+    textarea.style.height = Math.max(textarea.scrollHeight, 30) + "px";
+  }
+
+  function bindInputs(root) {
+    root.querySelectorAll("input, textarea").forEach(function (field) {
+      if (field.dataset.bound === "1") return;
+      field.dataset.bound = "1";
+
+      if (field.matches("textarea")) {
+        autoGrowTextarea(field);
+        field.addEventListener("input", function () {
+          autoGrowTextarea(field);
+          calculateInvoice(false);
+        });
+        field.addEventListener("change", function () {
+          autoGrowTextarea(field);
+          calculateInvoice(false);
+        });
+      } else {
+        field.addEventListener("input", function () {
+          const source = field.matches(".qty, .unit-price, .vat-rate");
+          calculateInvoice(source);
+        });
+        field.addEventListener("change", function () {
+          const source = field.matches(".qty, .unit-price, .vat-rate");
+          calculateInvoice(source);
+        });
+      }
+    });
+  }
+
+  function renumberRows() {
+    document.querySelectorAll("#itemRows .item-row").forEach(function (row, index) {
+      const numberCell = row.querySelector(".row-no");
+      if (numberCell) numberCell.textContent = index + 1;
+    });
+  }
+
+  window.addItemRow = function () {
+    const tbody = document.getElementById("itemRows");
+    if (!tbody) return;
+
+    const row = document.createElement("tr");
+    row.className = "item-row";
+    row.innerHTML =
+      '<td class="center row-no"></td>' +
+      '<td><textarea class="desc auto-grow" rows="1" ' +
+        'style="width:100%; min-height:8mm; resize:none; overflow:hidden; border:1px solid transparent; background:transparent; font:inherit; padding:1px 2px; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere;">New Item</textarea></td>' +
+      '<td><input class="hs" value="—"></td>' +
+      '<td><input class="qty" type="number" min="0" step="any" value="0"></td>' +
+      '<td><input class="unit-price" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="taxable input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="vat-rate" type="number" min="0" step="0.01" value="5"></td>' +
+      '<td><input class="vat-usd input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="total-usd input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="total-aed input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td class="center action-col"><button type="button" class="remove-row" onclick="removeItemRow(this)">Remove</button></td>';
+
+    tbody.appendChild(row);
+    bindInputs(row);
+    renumberRows();
+    calculateInvoice(true);
+  };
+
+  window.removeItemRow = function (button) {
+    if (!button) return;
+
+    const row = button.closest(".item-row");
+    const tbody = document.getElementById("itemRows");
+    if (!row || !tbody) return;
+
+    const rows = tbody.querySelectorAll(".item-row");
+    if (rows.length <= 1) {
+      alert("At least one item row is required.");
+      return;
+    }
+
+    row.remove();
+    renumberRows();
+    calculateInvoice();
+  };
+
+  window.addSummaryRow = function () {
+    const tbody = document.getElementById("summaryRows");
+    if (!tbody) return;
+
+    const rate = conversionRate() || 3.4977;
+    const row = document.createElement("tr");
+    row.className = "summary-row";
+    row.innerHTML =
+      '<td><textarea class="summary-name auto-grow" rows="1" ' +
+        'style="width:100%; min-height:8mm; resize:none; overflow:hidden; border:1px solid transparent; background:transparent; font:inherit; padding:1px 2px; box-sizing:border-box; white-space:pre-wrap; overflow-wrap:anywhere;">New Summary</textarea></td>' +
+      '<td><input class="summary-rate" type="number" min="0" step="0.01" value="5"></td>' +
+      '<td><input class="summary-usd input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="conversion-rate input-number" type="number" min="0" step="0.0001" value="' + rate.toFixed(4) + '"></td>' +
+      '<td><input class="summary-aed input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td><input class="summary-vat-aed input-number" type="number" min="0" step="0.01" value="0"></td>' +
+      '<td class="center action-col"><button type="button" class="remove-row" onclick="removeSummaryRow(this)">Remove</button></td>';
+
+    tbody.appendChild(row);
+    bindInputs(row);
+    calculateInvoice();
+  };
+
+  window.removeSummaryRow = function (button) {
+    if (!button) return;
+
+    const row = button.closest(".summary-row");
+    const tbody = document.getElementById("summaryRows");
+    if (!row || !tbody) return;
+
+    const rows = tbody.querySelectorAll(".summary-row");
+    if (rows.length <= 1) {
+      alert("At least one summary row is required.");
+      return;
+    }
+
+    row.remove();
+    calculateInvoice();
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("#itemRows .item-row, #summaryRows .summary-row").forEach(bindInputs);
+    renumberRows();
+    calculateInvoice(true);
+  });
+})();
+</script>
+
+ 
+ 
+</body>
+</html>
